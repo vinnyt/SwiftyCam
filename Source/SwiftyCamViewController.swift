@@ -601,6 +601,28 @@ open class SwiftyCamViewController: UIViewController {
 
 	*/
 
+    public func resetCamera() {
+        session.stopRunning()
+
+        sessionQueue.async { [unowned self] in
+
+            // remove and re-add inputs and outputs
+
+            for input in self.session.inputs {
+                self.session.removeInput(input )
+            }
+
+            self.addInputs()
+            DispatchQueue.main.async {
+                self.cameraDelegate?.swiftyCam(self, didSwitchCameras: self.currentCamera)
+            }
+
+            self.session.startRunning()
+        }
+
+        // If flash is enabled, disable it as the torch is needed for front facing camera
+        disableFlash()
+    }
 
 	public func switchCamera() {
 		guard isVideoRecording != true else {
